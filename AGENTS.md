@@ -6,7 +6,15 @@
 **项目类型**: iFlow CLI 技能集合  
 **项目目标**: 为 iFlow CLI 提供可重用的专业技能扩展，提升开发效率和代码质量
 
-本项目是一个 iFlow CLI 技能库，包含多个专业化的技能（Skills），每个技能针对特定的开发场景提供系统化的工作流程和最佳实践指导。
+本项目是一个通用的 iFlow CLI 技能库，包含多个专业化的技能（Skills）和命令（Commands），每个技能针对特定的开发场景提供系统化的工作流程和最佳实践指导。项目支持中文界面，并能根据项目环境动态适配不同的代码规范。
+
+## 项目特色
+
+- **通用化设计**: 技能可在不同项目中使用，自动适配项目特定的代码规范
+- **智能检测**: 自动检测项目环境，动态加载项目配置和规范
+- **中文化支持**: 所有技能和命令均使用中文，提供更好的用户体验
+- **双模式运行**: 支持全局安装和项目级安装，灵活适应不同使用场景
+- **规范优先**: 强调"先规划，后执行"的开发理念，提高代码质量
 
 ## 项目结构
 
@@ -18,17 +26,23 @@ iflow-skills/
 │   ├── frontend-code-review/        # 前端代码审查技能
 │   │   ├── SKILL.md                 # 技能定义文件
 │   │   └── references/              # 参考文档
-│   │       ├── lvm-standards.md     # LVM 项目代码标准
+│   │       ├── lvm-standards.md     # 代码标准示例
 │   │       └── react-best-practices.md  # React 最佳实践
-│   ├── spec-mode/                   # 规范优先开发模式技能
-│   │   ├── SKILL.md                 # 技能定义文件
-│   │   ├── README.md                # 技能说明
-│   │   └── examples/                # 示例用例
-│   │       └── shopping-cart/       # 购物车功能示例
-│   │           ├── requirements.md  # 需求文档
-│   │           ├── design.md        # 设计文档
-│   │           └── tasks.md         # 任务清单
-│   └── frontend-code-review.md      # 前端代码审查简化版
+│   └── spec-mode/                   # 规范优先开发模式技能
+│       ├── SKILL.md                 # 技能定义文件
+│       ├── README.md                # 技能说明
+│       └── examples/                # 示例用例
+│           └── shopping-cart/       # 购物车功能示例
+│               ├── requirements.md  # 需求文档
+│               ├── design.md        # 设计文档
+│               └── tasks.md         # 任务清单
+├── commands/                        # 命令配置目录
+│   ├── command-creator.toml         # 命令创建器配置
+│   ├── frontend-code-review.toml    # 前端代码审查配置
+│   └── spec-mode.toml               # 规范优先开发模式配置
+├── .iflow/                          # iFlow 配置目录（隐藏）
+│   ├── project-detection.md         # 项目规范检测逻辑文档
+│   └── project.json                 # 项目元数据（自动生成）
 ├── README.md                        # 项目说明文档
 └── AGENTS.md                        # 本文件（项目上下文）
 ```
@@ -56,57 +70,62 @@ iflow-skills/
 - 项目命令: `{project}/.iflow/commands/`
 
 **配置格式**:
-- **TOML 格式**: 适合复杂命令，支持多行提示词
-- **Markdown 格式**: 适合简单命令，格式简洁
+- **TOML 格式**: 适合复杂命令，支持多行提示词，结构清晰
+- **Markdown 格式**: 适合简单命令，格式简洁直观
+
+**特点**:
+- 全中文界面，易于理解
+- 提供详细的创建向导
+- 支持命令分类参考
+- 包含验证步骤和最佳实践
 
 ### 2. Frontend Code Review (前端代码审查)
 
 **技能名称**: `frontend-code-review`  
-**用途**: 对 LVM 项目的前端代码进行系统性审查
+**用途**: 对前端代码进行系统性审查，支持动态加载项目规范
 
-**技术栈**: Tauri + React + TypeScript + Ant Design + Redux Toolkit
+**核心特性**:
+- **智能环境检测**: 自动判断是项目环境还是全局环境
+- **动态规范加载**: 根据项目配置自动加载项目特定的代码规范
+- **通用化设计**: 移除了特定项目的硬编码规范，适用于各种前端项目
 
 **审查范围**:
-- React 组件（`.tsx`, `.jsx`）
-- TypeScript/JavaScript 文件（`.ts`, `.js`）
-- 自定义 Hooks
-- Redux Slices
+- React/Vue/Angular 等前端框架组件
+- TypeScript/JavaScript 文件
+- 自定义 Hooks/Composables
+- 状态管理代码
 - 路由配置
 - API 调用层
 
-**审查标准**:
-- 代码风格（Prettier + ESLint）
-- TypeScript 类型安全
-- React 最佳实践
-- Tauri API 调用规范
-- 状态管理规范
-- 性能优化
-- 安全性检查
+**审查标准**（动态加载）:
+- 代码风格（基于项目的 Prettier 和 ESLint 配置）
+- TypeScript 类型安全（基于项目的 tsconfig.json）
+- 框架最佳实践（基于项目使用的框架）
+- 项目特定的规范（从 AGENTS.md、CONTRIBUTING.md 等文档加载）
 
-**关键规范**:
-- **导入顺序**: Node.js 内置 → 外部依赖 → 内部模块（@/）→ 相对导入
-- **Props 定义**: 必须使用接口定义，命名格式为 `ComponentNameProps`
-- **Tauri API**: 必须使用 `safeInvoke` 封装，指定返回类型
-- **Hooks 使用**: 必须在顶层调用，依赖数组完整
-- **性能优化**: 使用 `useCallback`、`useMemo`、`React.memo`
-
-**代码风格配置**:
-- 打印宽度: 100 字符
-- 缩进: 2 空格
-- 引号: 单引号（JSX 属性使用双引号）
-- 分号: 必须使用
-- 尾随逗号: ES5 风格
+**环境检测机制**:
+1. 检查是否存在项目配置文件（package.json、tsconfig.json 等）
+2. 读取项目的代码规范配置
+3. 查找项目规范文档（AGENTS.md、CONTRIBUTING.md 等）
+4. 分析现有代码的风格和模式
+5. 按优先级合并规范：项目规范 > 技能库规范 > 通用标准
 
 **审查输出**:
 - 总体评价（质量等级、主要优点、主要问题）
-- 详细问题列表（按优先级排序）
+- 详细问题列表（按优先级排序：严重问题、警告、建议）
 - 最佳实践建议
 - Git Commit 信息（英文，遵循 Conventional Commits）
 - PR 描述模板
 
+**通用代码标准**（当无项目规范时使用）:
+- 文件命名规范：组件用 PascalCase，工具函数用 camelCase
+- 导入顺序：内置模块 → 外部依赖 → 内部模块 → 相对导入
+- 组件结构：Hooks → 副作用 → 事件处理器 → 渲染
+
 **参考文档**:
-- `skills/frontend-code-review/references/lvm-standards.md` - LVM 项目代码标准
+- `skills/frontend-code-review/references/lvm-standards.md` - 代码标准示例
 - `skills/frontend-code-review/references/react-best-practices.md` - React 最佳实践
+- `.iflow/project-detection.md` - 项目规范检测逻辑
 
 ### 3. Spec Mode (规范优先开发模式)
 
@@ -122,28 +141,28 @@ iflow-skills/
 
 **自动产出**:
 1. **需求文档** (`.iflow/specs/<feature-name>/requirements.md`)
-   - 功能概述
-   - 用户故事
-   - 功能需求
-   - UI/UX 需求
-   - 数据需求
-   - 技术约束
-   - 依赖与排期
-   - 风险评估
+   - 功能概述（背景、目标、范围）
+   - 用户故事（用户角色、使用场景、验收标准）
+   - 功能需求（功能点列表、非功能性需求）
+   - UI/UX 需求（页面结构、交互流程、国际化）
+   - 数据需求（数据结构、API 接口、状态管理）
+   - 技术约束、依赖与排期、风险评估
 
 2. **设计文档** (`.iflow/specs/<feature-name>/design.md`)
-   - 总体设计
-   - 详细设计（组件、数据流、API、路由、国际化）
+   - 总体设计（架构概览、技术选型、文件结构）
+   - 详细设计（组件设计、数据流、API 设计、路由设计、国际化）
    - 类型定义
-   - 实现细节
-   - 测试策略
-   - 代码规范
+   - 实现细节（核心逻辑、边界情况、错误处理、性能优化）
+   - 测试策略（单元测试、集成测试、E2E 测试）
+   - 代码规范（命名规范、代码风格、注释规范）
+   - 部署与发布
 
 3. **任务清单** (`.iflow/specs/<feature-name>/tasks.md`)
-   - 任务分解（6 个阶段）
-   - 验收标准
-   - 任务依赖关系
-   - 进度跟踪
+   - 任务分解（6 个阶段：准备工作、核心开发、集成与配置、测试与优化、代码质量、部署准备）
+   - 每个任务的验收标准
+   - 任务依赖关系图
+   - 进度跟踪表格
+   - 风险与缓解措施
 
 **工作流程**:
 1. **阶段 1**: 需求分析 - 理解用户需求，分析现有实现
@@ -152,40 +171,124 @@ iflow-skills/
 4. **阶段 4**: 用户确认 - 向用户展示文档，等待确认
 5. **阶段 5**: 执行开发（可选）- 按照任务清单执行
 
+**特点**:
+- 全中文文档输出
+- 通用化设计，移除了特定技术栈的硬编码
+- 支持根据项目规范动态调整工作流程
+- 包含学习与优化机制
+
 **示例**:
 - `skills/spec-mode/examples/shopping-cart/` - 购物车功能完整示例
   - `requirements.md` - 需求定义
   - `design.md` - 技术设计
   - `tasks.md` - 实现任务清单
 
-**学习与优化**:
-- 收集用户反馈和纠正
-- 更新 Skill 模板
-- 沉淀项目知识
+## 命令配置
 
-## 技术栈参考
+### 命令列表
 
-### 前端技术栈（LVM 项目）
-- **框架**: React 19.1.0
-- **UI 组件库**: Ant Design 6.3.0
-- **状态管理**: Redux Toolkit 2.11.2
-- **路由**: React Router DOM 7.13.0
-- **国际化**: i18next 25.8.13
-- **桌面框架**: Tauri
-- **构建工具**: Bun
+项目提供了三个预配置的命令文件，位于 `commands/` 目录：
 
-### 代码质量工具
-- **类型检查**: TypeScript
-- **代码格式化**: Prettier
-- **代码检查**: ESLint
-- **测试框架**: Vitest + React Testing Library（建议）
+1. **command-creator.toml**
+   - 命令创建器的完整配置
+   - 包含详细的工作流程和最佳实践
 
-### 文件命名规范
-- 组件: PascalCase（如 `VersionTable.tsx`）
-- 工具函数: camelCase（如 `store.ts`）
-- 常量/枚举: PascalCase（如 `LangEnum`）
-- 自定义 Hook: camelCase + `use` 前缀（如 `useDownload.ts`）
-- 类型定义: camelCase（如 `common.ts`）
+2. **frontend-code-review.toml**
+   - 前端代码审查的完整配置
+   - 包含环境检测逻辑和规范加载机制
+
+3. **spec-mode.toml**
+   - 规范优先开发模式的完整配置
+   - 包含三个阶段的详细工作流程
+
+### 命令安装
+
+**全局安装**:
+```bash
+# 将命令安装到全局
+/commands add command-creator
+/commands add frontend-code-review
+/commands add spec-mode
+```
+
+**项目安装**:
+```bash
+# 将命令安装到当前项目
+# 命令会自动检测项目环境并使用项目规范
+```
+
+### 命令管理
+```bash
+# 查看在线命令列表
+/commands online
+
+# 查看命令详情
+/commands get <id>
+
+# 列出已安装命令
+/commands list
+
+# 删除命令
+/commands remove <name>
+```
+
+## 项目规范检测机制
+
+### 概述
+
+项目规范检测是通用技能库的核心能力，通过动态检测和加载项目规范，确保技能能够在不同项目中正确工作。
+
+### 检测流程
+
+1. **环境检测**
+   - 判断当前是项目环境还是全局环境
+   - 通过检测项目配置文件（package.json、tsconfig.json、requirements.txt 等）
+
+2. **配置文件读取**
+   - 读取项目的各种配置文件
+   - 提取项目的代码规范设置
+
+3. **规范文档查找**
+   - 自动查找项目中的规范文档（AGENTS.md、CONTRIBUTING.md、docs/standards.md 等）
+   - 按照优先级查找不同位置的规范
+
+4. **代码风格分析**
+   - 分析现有代码的导入顺序
+   - 识别命名规范
+   - 检测状态管理方案
+
+5. **规范合并策略**
+   - 按照优先级合并：项目规范 > 技能库规范 > 通用标准
+   - 解决规范冲突
+
+### 优先级规则
+
+1. **项目特定规范**（最高优先级）
+   - 项目配置文件中的设置
+   - 项目规范文档中的规定
+
+2. **技能库参考**（中等优先级）
+   - 技能自带的参考文档
+   - 通用的最佳实践
+
+3. **通用标准**（最低优先级）
+   - 语言/框架官方推荐
+   - 行业通用标准
+
+### 支持的项目类型
+
+- **React 项目**: 检测 package.json 中的 react 依赖
+- **Vue 项目**: 检测 package.json 中的 vue 依赖
+- **Node.js 后端项目**: 检测无前端框架的 Node.js 项目
+- **Python 项目**: 检测 requirements.txt 或 pyproject.toml
+- **Rust 项目**: 检测 Cargo.toml
+- **Go 项目**: 检测 go.mod
+- **Java 项目**: 检测 pom.xml 或 build.gradle
+
+### 详细文档
+
+完整的项目规范检测逻辑请参考：
+- `.iflow/project-detection.md` - 详细的技术实现文档
 
 ## 常用命令
 
@@ -205,23 +308,6 @@ git diff HEAD~N HEAD
 
 # 比较分支
 git diff main...HEAD
-```
-
-### 代码质量检查
-```bash
-# 运行 ESLint 检查
-bun run lint
-
-# 自动修复 ESLint 问题
-bun run lint:fix
-
-# 运行 Prettier 格式化
-bun run format
-
-# TypeScript 类型检查
-bun run build
-# 或
-tsc --noEmit
 ```
 
 ### 命令管理
@@ -245,6 +331,7 @@ tsc --noEmit
 ## 项目规范要点
 
 ### Conventional Commits 规范
+
 所有 Git 提交信息必须使用英文，遵循以下格式：
 
 ```
@@ -262,13 +349,12 @@ tsc --noEmit
 - `chore`: 构建/CI 相关
 - `build`: 构建系统或外部依赖变更
 
-**作用域（scope）**:
+**作用域（scope）**（根据项目调整）:
 - `frontend`: 前端代码
-- `rust`: 后端 Rust 代码
-- `i18n`: 国际化
-- `types`: 类型定义
-- `api`: API 层
+- `backend`: 后端代码
 - `ui`: UI 组件
+- `api`: API 层
+- 或其他项目特定的作用域
 
 **主题（subject）规则**:
 - 使用祈使语气（"add" 而非 "added"）
@@ -280,40 +366,46 @@ tsc --noEmit
 ```
 feat(frontend): add sidebar collapse feature
 
-refactor(ui): improve version table structure
+refactor(ui): improve component structure
 
-fix(types): correct prop interface definition
+fix(api): correct response handling
 ```
 
-### React 开发最佳实践
+### 通用开发最佳实践
+
 1. **组件结构**: Hooks → 副作用 → 事件处理器 → 渲染
 2. **Hooks 使用**: 必须在顶层调用，依赖数组完整
 3. **性能优化**: 使用 `useCallback`、`useMemo`、`React.memo`
 4. **错误处理**: 完整的 try-catch 和用户反馈
 5. **类型安全**: 必须定义 Props 接口，避免使用 `any`
 
-### Tauri API 调用规范
-1. **使用 safeInvoke**: 必须使用 `safeInvoke` 封装 Tauri 命令
-2. **类型安全**: 显式指定返回类型（如 `safeInvoke<VersionResult>`）
-3. **事件监听**: 必须清理事件监听器
-4. **错误处理**: 完整的错误处理和用户提示
+### 文件命名规范
 
-### 国际化规范
-1. **所有用户可见文本**: 必须使用 `t()` 函数
-2. **翻译 key**: 使用点号分隔的命名空间（如 `cart.addToCart`）
-3. **双语支持**: 中英文双语定义
-4. **参数化**: 使用 `{placeholder}` 语法支持参数
+- **组件**: PascalCase（如 `UserList.tsx`）
+- **工具函数**: camelCase（如 `formatDate.ts`）
+- **常量**: UPPER_SNAKE_CASE（如 `API_BASE_URL`）
+- **自定义 Hooks**: camelCase + `use` 前缀（如 `useAuth.ts`）
+- **类型定义**: camelCase（如 `common.ts`）
+
+### 导入顺序
+
+1. Node.js 内置模块
+2. 外部依赖
+3. 内部模块（使用项目别名）
+4. 相对导入
 
 ## 开发工作流
 
 ### 前端代码审查流程
 1. 获取代码变更（git diff）
-2. 识别变更类型（新增、修改、删除）
-3. 执行自动化检查（ESLint、Prettier、TypeScript）
-4. 执行手动审查（代码风格、类型安全、最佳实践）
-5. 生成审查报告
-6. 确定审批状态
-7. 生成 Commit 信息和 PR 描述
+2. 检测项目环境（全局或项目级）
+3. 加载项目规范配置
+4. 识别变更类型（新增、修改、删除）
+5. 执行自动化检查（ESLint、Prettier、TypeScript）
+6. 执行手动审查（代码风格、类型安全、最佳实践）
+7. 生成审查报告（中文）
+8. 确定审批状态
+9. 生成 Commit 信息（英文）和 PR 描述
 
 ### 规范优先开发流程
 1. 需求分析（生成 requirements.md）
@@ -324,10 +416,18 @@ fix(types): correct prop interface definition
 6. 测试与优化
 7. 代码提交
 
+### 命令创建流程
+1. 收集用户需求
+2. 选择配置格式（TOML 或 Markdown）
+3. 生成配置文件
+4. 确认安装位置（全局或项目级）
+5. 生成命令文件
+6. 验证命令配置
+
 ## 质量保证
 
 ### 代码审查检查清单
-- [ ] 代码符合 Prettier 和 ESLint 规则
+- [ ] 代码符合项目的 Prettier 和 ESLint 规则
 - [ ] TypeScript 类型定义完整且正确
 - [ ] 导入顺序正确
 - [ ] 组件结构清晰，职责单一
@@ -354,17 +454,17 @@ fix(types): correct prop interface definition
 ### 内部文档
 - **项目上下文**: `AGENTS.md`（本文件）
 - **项目说明**: `README.md`
-- **LVM 代码标准**: `skills/frontend-code-review/references/lvm-standards.md`
+- **项目规范检测**: `.iflow/project-detection.md`
+- **代码标准示例**: `skills/frontend-code-review/references/lvm-standards.md`
 - **React 最佳实践**: `skills/frontend-code-review/references/react-best-practices.md`
 
 ### 外部资源
 - [React 官方文档](https://react.dev/)
 - [TypeScript 官方文档](https://www.typescriptlang.org/)
-- [Ant Design 文档](https://ant.design/)
-- [Redux Toolkit 文档](https://redux-toolkit.js.org/)
-- [Tauri 官方文档](https://tauri.app/)
-- [i18next 文档](https://www.i18next.com/)
+- [Vue 官方文档](https://vuejs.org/)
 - [Conventional Commits](https://www.conventionalcommits.org/)
+- [Prettier 文档](https://prettier.io/)
+- [ESLint 文档](https://eslint.org/)
 
 ## 常见问题
 
@@ -372,7 +472,7 @@ fix(types): correct prop interface definition
 A: 使用 `command-creator` 技能，按照提示定义命令描述和提示词，选择配置格式（TOML 或 Markdown），然后安装到全局或项目级。
 
 ### Q: 如何进行前端代码审查？
-A: 使用 `frontend-code-review` 技能，提供 git diff 输出，技能将执行系统性审查，生成详细的审查报告和 Commit 信息。
+A: 使用 `frontend-code-review` 技能，提供 git diff 输出。技能会自动检测项目环境，加载项目特定的代码规范，然后执行系统性审查，生成详细的审查报告和 Commit 信息。
 
 ### Q: 如何使用规范优先开发模式？
 A: 当提出新功能需求或 Bug 修复时，`spec-mode` 技能会自动触发，生成需求文档、设计文档和任务清单，等待用户确认后开始开发。
@@ -381,35 +481,58 @@ A: 当提出新功能需求或 Bug 修复时，`spec-mode` 技能会自动触发
 A: 除了 Git Commit 信息必须使用英文（遵循 Conventional Commits 规范）外，所有审查报告内容都使用中文。
 
 ### Q: 如何确保代码符合项目规范？
-A: 使用 `frontend-code-review` 技能进行审查，它会检查代码是否符合 Prettier、ESLint、TypeScript 和项目特定的代码规范。
+A: 使用 `frontend-code-review` 技能进行审查，它会自动检测项目环境，加载项目特定的代码规范，然后检查代码是否符合这些规范。如果项目没有明确规范，则使用通用的最佳实践。
+
+### Q: 全局安装和项目安装有什么区别？
+A: 全局安装的命令在所有项目中都使用通用的最佳实践；项目安装的命令会自动检测项目环境，使用项目特定的代码规范。项目命令的优先级高于全局命令。
+
+### Q: 支持哪些项目类型？
+A: 支持多种项目类型，包括 React、Vue、Node.js、Python、Rust、Go、Java 等。技能会自动检测项目类型并加载相应的规范。
 
 ## 维护指南
 
 ### 添加新技能
 1. 在 `skills/` 目录下创建新的技能目录
 2. 创建 `SKILL.md` 文件，定义技能元数据和工作流程
-3. 如需要，创建参考文档和示例
-4. 更新本文档的"核心技能说明"部分
+3. 确保所有内容使用中文
+4. 移除客制化内容，使其成为通用技能
+5. 如需要，创建参考文档和示例
+6. 在 `commands/` 目录创建对应的 command 配置文件
+7. 更新本文档的"核心技能说明"部分
 
 ### 更新现有技能
 1. 修改对应的 `SKILL.md` 文件
-2. 更新参考文档（如有）
-3. 更新示例（如有）
-4. 测试技能功能
+2. 更新对应的 command 配置文件
+3. 更新参考文档（如有）
+4. 更新示例（如有）
+5. 测试技能功能
+6. 确保中文化完整性
+
+### 更新项目规范检测
+1. 修改 `.iflow/project-detection.md` 文档
+2. 添加新的项目类型支持
+3. 更新配置文件读取逻辑
+4. 测试环境检测功能
+5. 确保向后兼容性
 
 ### 更新项目规范
-1. 更新 `skills/frontend-code-review/references/lvm-standards.md`
+1. 更新通用代码标准
 2. 更新本文档的"项目规范要点"部分
 3. 确保所有技能都遵循新规范
+4. 更新参考文档
 
 ## 版本历史
 
-- **v1.0.0** (2025-01-XX): 初始版本
+- **v1.0.0** (2025-03-03): 初始版本
   - 包含 command-creator、frontend-code-review、spec-mode 三个核心技能
-  - 提供完整的 LVM 项目代码标准和 React 最佳实践参考
-  - 包含购物车功能示例
+  - 提供完整的 command 配置文件
+  - 实现项目规范检测机制
+  - 全部内容中文化
+  - 移除客制化内容，实现通用化设计
+  - 支持全局和项目级安装
 
 ---
 
 **最后更新**: 2025-03-03  
-**维护者**: iFlow Skills Team
+**维护者**: iFlow Skills Team  
+**仓库**: https://github.com/lryouyu/iflow-skills.git
